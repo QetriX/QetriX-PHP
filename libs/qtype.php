@@ -1,16 +1,16 @@
 <?php namespace com\qetrix\libs;
 
-	/* Copyright (c) 2015 QetriX. Licensed under MIT License, see /LICENSE.txt file.
-	 * Type
-	 */
-
-/* TODO:
- * Date Format (custom)
- * For value comparsion - is better bigger (speed, power, population, capacity) or smaller value (price, weight, acceleration, power intake)? Valid for calcualted values as well.
-*/
+/* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
+ * 16.01.29 | QetriX Type
+ */
 
 class QType
 {
+	/* TODO:
+	 * Date Format (custom)
+	 * For value comparsion - is better bigger (speed, power, population, capacity) or smaller value (price, weight, acceleration, power intake)? Valid for calcualted values as well.
+	*/
+
 	// Class content
 	protected $t_pk = null; // Primary Key, null = new (not in DS yet)
 	protected $tn; // Lang key for name
@@ -61,10 +61,10 @@ class QType
 	}
 
 	/** Value precision
-	* Number: 100=hundreads, 10=tens, 0.1=1/10, 0.01=1/100
-	* DateTime: 1=year, 2=half, 3=quarter, 4=month, 5=week, 6=day, 7=hour, 8=minute, 9=second
-	* Time: 1=year, 2=half, 3=quarter, 4=month, 5=week, 6=day, 7=hour, 8=minute, 9=second, 10=1/10 sec, 11=1/100 sec, 12=1/1000 sec
-	*/
+	 * Number: 100=hundreads, 10=tens, 0.1=1/10, 0.01=1/100
+	 * DateTime: 1=year, 2=half, 3=quarter, 4=month, 5=week, 6=day, 7=hour, 8=minute, 9=second
+	 * Time: 1=year, 2=half, 3=quarter, 4=month, 5=week, 6=day, 7=hour, 8=minute, 9=second, 10=1/10 sec, 11=1/100 sec, 12=1/1000 sec
+	 */
 	public function valuePrecision($value = null)
 	{
 		if ($value === null) return $this->tvp;
@@ -149,8 +149,8 @@ final class ValueType
 final class ValueMode
 {
 	const hidden = 0;
-	const disabled = 1;
-	//const readOnly = 2;
+	const disabled = 2;
+	//const readOnly = 3;
 	const normal = 4;
 	const required = 6;
 	const uniqueInClass = 8;
@@ -167,14 +167,6 @@ final class RelationType
 	const none = 0;
 	const system = 1;
 
-	const suggest = 2; // %s%
-	const suggestMRU = 3;
-	const suggestMOU = 4;
-
-	const suggestTt = 5; // %s%
-	const suggestTtMRU = 6;
-	const suggestTtMOU = 7;
-
 	const autocomplete = 10; // Autocomplete from all (s%)
 	const autocompleteMRU = 11; // Offer Most Recently Used
 	const autocompleteMOU = 12; // Offer Most Often Used
@@ -183,13 +175,21 @@ final class RelationType
 	const autocompleteTtMRU = 14;
 	const autocompleteTtMOU = 15;
 
-	const listBoxClass = 20; //
-	const listBoxEntAttribs = 21;
-	const listBoxEntAttribsEt = 22;
-	const listBoxEntRels = 23;
-	const listBoxEntRelsEt = 24;
+	const suggest = 20; // %s%
+	const suggestMRU = 21;
+	const suggestMOU = 22;
 
-	const keyValue = 30; // As Maximo - dual field with textbox for both ID and Text (allows autocomplete of corresponding values for ID and Text as well), with button that brings up table
+	const suggestTt = 23; // %s%
+	const suggestTtMRU = 24;
+	const suggestTtMOU = 25;
+
+	const listBoxClass = 30; //
+	const listBoxEntAttribs = 31;
+	const listBoxEntAttribsEt = 32;
+	const listBoxEntRels = 33;
+	const listBoxEntRelsEt = 34;
+
+	const keyValue = 40; // As Maximo - dual field with textbox for both ID and Text (allows autocomplete of corresponding values for ID and Text as well), with button that brings up table
 
 	public static function toArray()
 	{
@@ -202,7 +202,7 @@ final class RelationMode
 	const hidden = 0;
 
 	const oneWay = 1;
-	const oneWayReadOnly = 2;
+	const oneWayDisabled = 2;
 	const oneWayRequired = 3;
 
 	// TODO: No, significant is NOT a way to tell QetriX THIS is the relation it should follow to find primary parent. I'm thinking about using ORDER instead, but how?
@@ -217,7 +217,7 @@ final class RelationMode
 
 	// Use case: partners or spouses
 	const twoWay = 11;
-	const twoWayReadOnly = 12;
+	const twoWayDisabled = 12;
 	const twoWayRequired = 13;
 
 	public static function toArray()
@@ -230,8 +230,8 @@ final class OrderType
 {
 	const none = 0;
 	const system = 1;
-	const value = 2; // Order per value, ascending
-	const valueDesc = 3; // Order per value, descending
+	const value = 2; // Order per value, ascending (lower better)
+	const valueDesc = 3; // Order per value, descending (higher better)
 	//const classOrder = 4; // List of values per classification
 	const numericOrder = 5;
 	const numericOrderDesc = 6;
