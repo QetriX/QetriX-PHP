@@ -1,7 +1,8 @@
-<?php namespace com\qetrix\libs;
+<?php
+namespace com\qetrix\libs;
 
-/* Copyright (c) 2015 QetriX. Licensed under MIT License, see /LICENSE.txt file.
- * Entity Class
+/* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
+ * 16.01.29 | Entity Class
  */
 
 use com\qetrix\libs\Util;
@@ -39,11 +40,12 @@ class QEntity extends QParticle
 		}
 	}
 
-	function get($name, $property = "v")
+	function get($name, $property = "v", $nvl = null)
 	{
-		if (!isset($this->ar[$name]) || !isset($this->ar[$name][0])) return null; //throw new \Exception("Entity or relation of type \"".$name."\" doesn't exist in Entity \"".$this->pv."\" (#".$this->p_pk.")");
+		if (!isset($this->ar[$name]) || !isset($this->ar[$name][0])) return $nvl; //throw new \Exception("Entity or relation of type \"".$name."\" doesn't exist in Entity \"".$this->pv."\" (#".$this->p_pk.")");
 		switch ($property) {
 			case "v":
+				if ($this->ar[$name][0]->value() == "" && $nvl !== null) return $nvl;
 				return $this->ar[$name][0]->value();
 			case "r":
 				return $this->ar[$name][0]->relation();
