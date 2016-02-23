@@ -1,0 +1,576 @@
+/* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
+ * 15.11.28 | QetriX Base CSS file
+ * CSS Reset is based on normalize.css v3.0.3 | MIT License | git.io/normalize
+ */
+
+@page-bg: #f3f3f3;
+@link-fg: #69c;
+@text-fg: #333;
+@head-height: 150px;
+
+/*
+444444 = Text
+6699cc = QetriX Blue
+808080 = (Gray) Gray text, map borders
+d3d3d3 = (LightGray) Shadows
+ecedec = Background, Map Bg
+
+nice red: color: #fB444B;
+
+table bg even: f8f8f8, but hover
+table hover bg: #f8fcff - #e7f1ff
+table hover border: #c0d6ec;
+
+Blue: 6699cc > c0d6ec > e7f1ff > f8fcff
+Gray: 444444 > 808080 > afafaf > d3d3d3 > ecedec
+*/
+
+/* region CSS Reset */
+* {
+	box-sizing: border-box;
+}
+
+@-ms-viewport {
+	width: device-width;
+}
+
+html, body {
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	background: @page-bg;
+	color: @text-fg;
+	font-family: sans-serif;
+	margin: 0;
+	min-height: 100%;
+	padding: 0;
+	width: 100%;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+	display: block;
+}
+
+audio, canvas, progress, video {
+	display: inline-block;
+	vertical-align: baseline;
+}
+
+audio:not([controls]) {
+	display: none;
+	height: 0;
+}
+
+[hidden], template {
+	display: none;
+}
+
+a {
+	background-color: transparent;
+}
+
+a:active, a:hover {
+	outline: 0;
+}
+
+abbr[title] {
+	border-bottom: 1px dotted;
+}
+
+b, strong {
+	font-weight: bold;
+}
+
+dfn {
+	font-style: italic;
+}
+
+h1 {
+	font-size: 0;
+	line-height:0;
+	margin:0;
+	padding:0;
+}
+
+mark {
+	background: #ff0;
+	color: #000;
+}
+
+small {
+	font-size: 80%;
+}
+
+sub, sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+
+sup {
+	top: -0.5em;
+}
+
+sub {
+	bottom: -0.25em;
+}
+
+img {
+	border: 0;
+}
+
+svg:not(:root) {
+	overflow: hidden;
+}
+
+figure {
+	margin: 1em 40px;
+}
+
+hr {
+	box-sizing: content-box;
+	height: 0;
+}
+
+pre {
+	overflow: auto;
+}
+
+code, kbd, pre, samp {
+	font-family: monospace, monospace;
+	font-size: 1em;
+}
+
+button, input, optgroup, select, textarea {
+	color: inherit;
+	font: inherit;
+	margin: 0;
+}
+
+button {
+	overflow: visible;
+}
+
+button, select {
+	text-transform: none;
+}
+
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+	-webkit-appearance: button;
+	cursor: pointer;
+}
+
+button[disabled], html input[disabled] {
+	cursor: default;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+
+input {
+	line-height: normal;
+}
+
+input[type="checkbox"], input[type="radio"] {
+	padding: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
+	height: auto;
+}
+
+input[type="search"] {
+	-webkit-appearance: textfield;
+	box-sizing: content-box;
+}
+
+input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
+	-webkit-appearance: none;
+}
+
+fieldset {
+	border: 1px solid #c0c0c0;
+	margin: 0 2px;
+	padding: 0.35em 0.625em 0.75em;
+}
+
+legend {
+	border: 0;
+	padding: 0;
+}
+
+textarea {
+	overflow: auto;
+}
+
+optgroup {
+	font-weight: bold;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+td, th {
+	padding: 0;
+}
+
+ul, ol {
+	padding-left: 24px;
+}
+/* endregion */
+
+/* region General */
+body {
+	font-size: 16px;
+	text-align: center;
+}
+
+::selection {
+	background: #69c;
+	color: #fff;
+}
+
+::-moz-selection {
+	background: #69c;
+	color: #fff;
+}
+
+a {
+	color: @link-fg;
+	text-decoration: underline;
+}
+
+a:hover, a:active, a:focus {
+	color: @text-fg;
+	text-decoration: underline;
+}
+
+h1 a, h1 span {
+	font-size: 0;
+	line-height: 0;
+	position: absolute;
+	z-index: 99;
+}
+
+h2 {
+	clear: both;
+	color: #933;
+	float: left;
+	font-size: 2em;
+	font-weight: normal;
+	margin: 0;
+	padding: 10px 0;
+	text-align: center;
+	width: 100%;
+}
+
+h3 {
+	clear: both;
+	color: @link-fg;
+	float: left;
+	font-size: 1.3em;
+	font-weight: normal;
+	margin: 20px 10px 10px 0;
+	width: 100%;
+}
+
+h4 {
+	clear: both;
+	float: left;
+	font-weight: normal;
+	margin: 12px 0 6px 0;
+	width: 100%;
+}
+
+input, textarea, select {
+	border-radius: 3px;
+	border: 1px solid #ccc;
+	font-family: tahoma, sans-serif;
+	padding: 3px 5px;
+	font-size: inherit;
+}
+
+input:hover, textarea:hover, select:hover {
+	border-color: #999;
+}
+
+input[type=text], textarea {
+	padding: 4px 0 4px 4px;
+}
+
+input[type=text]:focus, input[type=text]:active, textarea:focus, textarea:active {
+	border-color: #69c;
+}
+
+input[type=submit]:active {
+	background: #ccc;
+}
+
+.btn {
+	-moz-border-bottom-colors: none;
+	-moz-border-left-colors: none;
+	-moz-border-right-colors: none;
+	-moz-border-top-colors: none;
+	background-color: #f5f5f5;
+	/*background-image: linear-gradient(to bottom, #fff, #e6e6e6);
+	background-repeat: repeat-x;*/
+	border-color: #ccc #ccc #b3b3b3;
+	border-image: none;
+	border-radius: 4px;
+	border-style: solid;
+	border-width: 1px;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+	color: #333;
+	cursor: pointer;
+	display: inline-block;
+	font-size: inherit;
+	margin-bottom: 0;
+	padding: 4px 8px;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: bottom;
+}
+
+.btn:hover, .btn:focus, .btn:active, .btn.active, .btn.disabled, .btn[disabled] {
+	background-color: #e6e6e6;
+	color: #333;
+}
+
+.btn:active, .btn.active {
+}
+
+.btn:first-child {
+}
+
+.btn:hover, .btn:focus {
+	background-position: 0 -15px;
+	color: #333;
+	text-decoration: none;
+	//transition: background-position 0.1s linear 0s;
+}
+
+.btn:focus {
+	outline: thin dotted #333;
+	outline-offset: -2px;
+}
+
+.btn.active, .btn:active {
+	background-image: none;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+	outline: 0 none;
+}
+
+.btn.disabled, .btn[disabled] {
+	background-image: none;
+	box-shadow: none;
+	cursor: default;
+	opacity: 0.65;
+}
+
+/* endregion */
+
+.page {
+	background: #fff;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+	clear: both;
+	color: @text-fg;
+	cursor: default;
+	margin: 10px auto;
+	min-height: 100%;
+	overflow: hidden;
+	text-align: left;
+	width: 950px;
+}
+
+td, th {
+	padding: 6px 12px;
+}
+
+.tableview > div {
+	clear: both;
+}
+
+table.rowaction td {
+	cursor: pointer;
+}
+
+/* region Table of Contents (TOC) */
+#toc li {
+	list-style: none;
+}
+
+#toc ol ol {
+	margin-left: 17px;
+}
+
+#toc ol > li:first-child {
+	counter-reset: item;
+}
+
+/* Reset counter */
+#toc ol > li {
+	counter-increment: item;
+}
+
+/* Increment counter */
+#toc ol > li:before {
+	content: counters(item, ".") ". ";
+}
+
+/* endregion */
+
+/* region LightBox */
+#mw {
+	background: rgba(0, 0, 0, .6);
+	opacity: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 99;
+	transition: .1s opacity;
+	left: -100%;
+}
+
+#mw.vis {
+	left: 0;
+	opacity: 1;
+}
+
+#mwc {
+	background: rgba(255, 255, 255, .4) url(img/loading.gif) center center no-repeat;
+	border-radius: 7px;
+	border: 1px solid black;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	height: 100px;
+	margin: 0 auto;
+	overflow: hidden;
+	position: relative;
+	width: 100px;
+}
+
+#mwc .imglbl {
+	background: rgba(0, 0, 0, .6);
+	bottom: 0;
+	color: #fff;
+	font-size: 1.2em;
+	line-height: 1.4em;
+	opacity: 0;
+	padding: 12px 0;
+	position: absolute;
+	text-align: center;
+	text-shadow: 0 0 5px #000;
+	transition: .3s all;
+	width: 100%;
+}
+
+#mwc img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+#mwc:hover .imglbl {
+	opacity: 1;
+}
+
+/* endregion */
+
+/* region AutoComplete */
+#ac {
+	background: #fff;
+	border: 1px solid #999;
+	display: none;
+	position: absolute;
+	text-align: left;
+}
+
+#ac ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#ac li a {
+	padding: 3px 6px;
+	text-decoration: none;
+	float: left;
+	clear: both;
+	width: 100%;
+}
+
+#ac li a:hover {
+	background: #69c;
+	color: #fff;
+}
+
+/* endregion */
+
+#page_image {
+	height: 200px;
+	border-radius: 6px;
+	margin-bottom: 10px;
+	clear: both;
+	background-position: center top;
+}
+
+.spoiler {
+	height: 1.3em;
+	overflow: hidden;
+	border: 1px solid;
+}
+
+#ex.page {
+	background: #ffc;
+	color: #900;
+	font-size: 90%;
+	font-weight: bold;
+	padding: 0 20px 20px 20px;
+}
+
+#ex.page h2 {
+	clear: both;
+	width: 100%;
+}
+
+#ex.page h3 {
+	background: #900;
+	border-radius: 5px;
+	clear: both;
+	color: #ffc;
+	margin: 12px 0 0 0;
+	padding: 6px 12px;
+	width: 100%;
+}
+
+#ex.page td {
+	font-weight: normal;
+	padding: 2px 12px;
+}
+
+#ex.page tr:hover td {
+	background: #eeb;
+}
+
+/** form */
+.qform label {
+	padding-top:5px;
+}
+
+.qform .qfr {
+	margin-bottom:6px;
+	clear: both;
+}
+.qform input[readonly] {
+	background: #f3f3f3;
+}
+
+/** debug */
+
+.xdebug-var-dump {
+	text-align: left;
+	width: 750px;
+}
