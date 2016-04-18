@@ -2,15 +2,20 @@
 namespace com\qetrix\libs;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.02.04 | Authentication for users and apps
+ * 16.03.04 | Authentication for users and apps
  */
+
+/* TODO: It's too dependent with HTTP DS. Token can be pased as get(_t) and returned as header(token)
+*/
 
 class Auth
 {
 	private $_token = null;
 	private $_isAuth = false;
-	private $userID = null;
 	private $userInfo = null;
+
+	private $loginFormUsername = "loginform-username";
+	private $loginFormPassword = "loginform-password";
 
 	private $ds;
 	/** @var QApp */
@@ -26,33 +31,39 @@ class Auth
 		if ($this->isAuth()) return $this;
 		$this->app = QApp::getInstance();
 		$this->ds = $ds === null ? $this->app->ds() : $ds;
-		$oldToken = $this->app->envDS()->get("cookie", "token");
+		$oldToken = $this->app->envDS()->get("cookie", "token") ?: $this->app->envDS()->get("get", "_t");
 		if ($oldToken != "") {
 			$newToken = $this->token();
-			$ua = $this->app->envDS()->get("env", "user_agent");
-			if ($this->ds->authToken($oldToken, $newToken, Util::crc32($ua))) $this->token($newToken); else $this->logout();
+			if ($this->ds->authToken($oldToken, $newToken, Util::crc32($this->app->envDS()->get("env", "user_agent")))) $this->token($newToken); else $this->logout();
 		}
 		return $this;
+	}
+
+	function setFormFields($username, $password)
+	{
+		$this->loginFormUsername = $username;
+		$this->loginFormPassword = $password;
 	}
 
 	function signup($username, $password, $password2, $email)
 	{
 		if ($password != $password2) return -1;
-		$id = $this->ds->authSignup($username, $password, $email);
+		$id = $this->ds->authSignup($username, $this->password($password), $email);
 		return $id;
 	}
 
-	function login($username = null, $password = null)
+	function login($data)//$username = null, $password = null)
 	{
-		if ($username == "" || $password == "") return false;
+		if (!isset($data[$this->loginFormUsername]) || !isset($data[$this->loginFormPassword])) return false;
 		if ($this->isAuth()) return true;
 
 		$ua = $this->app->envDS()->get("env", "user_agent");
 		$ip = $this->app->envDS()->get("env", "remote_addr");
 		$newToken = $this->token();
-		$userdata = $this->ds->authLogin($username);
+		$userdata = $this->ds->authLogin($data[$this->loginFormUsername]);
+		//Util::log($userdata, "auth/login/userdata");
 		if ($userdata !== null) {
-			if (password_verify($password, $userdata["password"])) {
+			if (password_verify($data[$this->loginFormPassword], $userdata["password"])) {
 				$this->ds->authLoginSet($userdata["id"], $newToken, Util::crc32($ua), $ip, $this->getOS($ua).$this->getBrowser($ua));
 				$this->token($newToken);
 			} else return false;
@@ -62,21 +73,25 @@ class Auth
 
 	function get($key)
 	{
-		if ($this->userInfo == null) $this->userInfo = $this->ds->authDetail($this->_token)[0];
+		if ($this->ds === null) return "";
+		if ($this->userInfo == null) {
+			$info = $this->ds->authDetail($this->_token);
+			$this->userInfo = count($info) > 0 ? $info[0] : null;
+		}
 		if (!isset($this->userInfo[$key])) return "";
 		return $this->userInfo[$key];
 	}
 
-	function checkAccess($module, $method)
+	function checkAccess($module, $method, $pid = null)
 	{
-		$this->ds->authAccess($module, $method, $this->userID);
+		$this->ds->authAccess($module, $method, $pid, $this->get("id"));
 	}
 
 	function logout()
 	{
 		$this->_isAuth = false;
 		$this->_token = null;
-		$this->app->envDS()->set("cookie", "token", "");
+		$this->setToken("");
 		$ua = $this->app->envDS()->get("env", "user_agent");
 		$this->ds->authClose($this->_token, Util::crc32($ua));
 	}
@@ -84,27 +99,35 @@ class Auth
 	private function token($value = false)
 	{
 		if ($value === false) return Util::uuid(true);
-		$this->app->envDS()->set("cookie", "token", $value);
 		$this->_isAuth = true;
 		$this->_token = $value;
+		$this->setToken($value);
 		return $this;
 	}
 
-	// Generate new password
+	private function setToken($value)
+	{
+		$this->app->envDS()->set("cookie", "token", $value);
+		$this->app->envDS()->set("header", "token", $value);
+	}
+
+	/** Generate new password */
 	function password($password)
 	{
 		return password_hash($password, PASSWORD_BCRYPT);
 	}
-	// Not only human, but app auth as well
 
 	public function isAuth()
 	{
 		return $this->_isAuth;
 	}
 
-	public function username()
+	public function username($value = false)
 	{
-		return $this->get("un");
+		if ($value === false) return $this->get("un");
+		$this->_isAuth = false;
+		$this->userInfo = ["username" => $value]; // You can force user name, but the current user will be unauthenticated.
+		return $this;
 	}
 
 	public function email()
