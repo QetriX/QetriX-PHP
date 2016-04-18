@@ -1,6 +1,9 @@
-# Copyright (c) 2015 QetriX. Licensed under MIT License, see /LICENSE.txt file.
-# Apache .htaccess file for QetriX PHP. More at http://wiki.qetrix.com/.htaccess
+# Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
+# 17.04.14 | Apache .htaccess file for QetriX PHP.
 # Tested by http://htaccess.madewithlove.be
+
+# [NC] = Ignore Case, [L] = Last, [QSA] = Query String Append, [B] = Escape Backreferences, [R] = Redirect
+# https://httpd.apache.org/docs/trunk/rewrite/flags.html
 
 # Speed Tip: Turn Off ETags
 FileETag none
@@ -11,23 +14,24 @@ RewriteEngine On
 # Uncomment the line below for non-localhost
 #RewriteBase /
 
-# Allows Apmin
-RewriteCond %{REQUEST_URI} apmin\.(php|html)$
-RewriteRule ^(.*) $1 [L,QSA]
-
 # Allows Tests
 RewriteCond %{REQUEST_URI} tests/(.*)\.php$
 RewriteRule ^(.*) $1 [L,QSA]
 
 # Allows HTML, PHP and QUE files to be processed by qetrix.php
-RewriteCond %{REQUEST_URI} .*(\.html|\.php|\.que)$ [NC]
+RewriteCond %{REQUEST_URI} (.*)(\.html|\.php|\.que)$ [NC]
+RewriteCond %{REQUEST_URI} !(.*)(file\.php)$ [NC]
 RewriteRule ^(.*) qetrix.php?_p=$1 [L,QSA]
-#####RewriteRule ^qetrix.php? qetrix.php?_p=$1 [L,QSA]
 
 # Uncomment, if you want to process files by file.php
-#RewriteCond %{REQUEST_URI} .*!(\.css|\.js|\.jpg|\.png|\.gif)$ [NC]
-#RewriteRule ^file.php? file.php?_p=$1 [L,QSA]
+RewriteCond %{REQUEST_URI} .*(\.).{1,4}$ [NC]
+RewriteCond %{REQUEST_URI} !(.*)(css|js|jpg|png|gif|ico)$ [NC]
+RewriteRule ^(.*) libs/file.php?_p=$1 [L,QSA]
+
+# Uncomment, if you want to process data by file.php
+RewriteCond %{REQUEST_URI} (.*)/data/(.*)$ [NC]
+RewriteRule ^(.*) libs/file.php?_p=$1 [L,QSA]
 
 # Process pretty URLs
 RewriteCond %{REQUEST_URI} !.*(\.).{1,4}$ [NC]
-RewriteRule ^(.*) qetrix.php?_p=$1 [L,QSA]
+RewriteRule ^(.*) qetrix.php?_p=$1 [L,QSA,B]
