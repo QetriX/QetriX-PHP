@@ -1,90 +1,74 @@
-<?php namespace com\qetrix\libs;
+<?php declare(strict_types = 1);
+namespace com\qetrix\libs;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.02.18 | QetriX Module PHP class
+ * 16.05.16 | QetriX Module PHP class
  */
 
 use com\qetrix\libs\components\QList;
-use com\qetrix\libs\QApp;
+use com\qetrix\libs\components\QView;
+use com\qetrix\libs\QPage;
 use com\qetrix\libs\QEntity;
 use com\qetrix\libs\Util;
 
 class QModule
 {
-	protected $ds; // Primary DataStore
+	protected $_ds; // Primary DataStore
 	protected $varDS; // Variable files DataStore (logs, temps)
 	protected $dataDS; // Data DataStore
 	protected $contentDS; // Content DataStore (for PHP always FileSystem)
-
-	public $stage;
-
-	/** @var  QApp $app */
-	protected $app;
+	/** @var  QModuleStage $_stage */
+	public $_stage;
+	/** @var  QPage $_page */
+	protected $_page;
 	/** @var  QEntity $entity */
 	protected $entity;
-	protected $title = "QetriX";
-	protected $user = null;
+	protected $heading = "";
 
-	// PHP constructor
-	function __construct()
+	/** PHP constructor */
+	function __construct($page)
 	{
-		$this->QModule();
+		$this->QModule($page);
 	}
 
-	// Class Constructor
-	function QModule()
+	/** Class Constructor */
+	function QModule(QPage $page)
 	{
-		$this->app = QApp::getInstance();
-		$this->ds = $this->app()->ds();
-		$this->stage = $this->app()->envDS()->get("env", "remote_addr") == "127.0.0.1" || $this->app->envDS()->get("env", "remote_addr") == "::1" ? QModuleStage::dev : QModuleStage::prod;
+		$this->_page = $page;
+		$this->_ds = $this->page()->ds();
+		$this->_stage = $this->page()->stage();
 	}
 
+	/** @return DataStore */
 	public function ds()
 	{
-		return $this->ds;
+		return $this->_ds;
 	}
 
-	public function app()
+	/** @return QPage */
+	public function page()
 	{
-		return $this->app;
+		return $this->_page;
 	}
 
+	protected function QPage(Dict $args, $content, $heading = "", $style = "")
+	{
+		$page = new QView();
+		$page->heading($heading == "" ? $this->heading : "");
+		$page->add($content);
+		return $page->convert("page");
+	}
+
+	/** @return QModuleStage */
 	public function stage()
 	{
-		return $this->stage;
+		return $this->_stage;
 	}
 
-	public function trl_ac($args)
+	public function trl_ac()
 	{
 		$list = new QList("trl_ac");
-		$list->add($this->ds()->trl_ac($this->app()->envDS("post", "value"), $args["id"]));
+		$list->add($this->ds()->trl_ac($this->page()->getFormData("value"), $this->page()->get("id")));
 		return $list->convert();
-	}
-}
-
-// QModuleStage enum
-abstract class QModuleStage
-{
-	const debug = 1; // Debug env. on, detailed debug info, enabled only if something wents really wrong
-	const dev = 2; // Debug env. on, debug info, stack trace, default for localhost/dev env
-	const test = 3; // Testing, like production, but with testing (DS mockups for sending e-mails, WS push requests etc.), showing all warning or error messages
-	const prod = 4; // Production, supressed warnings/error messages
-}
-
-/**
- * @property mixed _entID
- */
-class QArgs
-{
-	private $_path;
-	private $_id;
-
-	public function path()
-	{
-		return $this->_path;
-	}
-	public function id()
-	{
-		return $this->_id;
 	}
 }
