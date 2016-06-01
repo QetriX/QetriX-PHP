@@ -2,10 +2,12 @@
 namespace com\qetrix\libs;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.02.22 | QetriX Utils Class
+ * 16.03.22 | QetriX Utils Class
  */
 
-///
+function x()
+{
+}
 
 /**
  * @param $code
@@ -45,35 +47,6 @@ function lbl2($code) // TODO: Merge with lbl
 	}
 	if (strpos($code, "_new") > 0) return lbl2(str_replace("_new", "", $code));
 	return '<span onclick="if (event.ctrlKey) {window.open(\''.D.'a/g/'.$code.'/\');return false;}">-'.$code."-</span>";
-}
-
-/**
- * @param $s
- *
- * @return string
- */
-function cs_utf2ascii($s)
-{
-	return strtr($s, array("\xc3\xa1" => "a", "\xc3\xa4" => "a", "\xc4\x8d" => "c", "\xc4\x8f" => "d", "\xc3\xa9" => "e", "\xc4\x9b" => "e", "\xc3\xad" => "i", "\xc4\xbe" => "l", "\xc4\xba" => "l", "\xc5\x88" => "n", "\xc3\xb3" => "o", "\xc3\xb6" => "o", "\xc5\x91" => "o", "\xc3\xb4" => "o", "\xc5\x99" => "r", "\xc5\x95" => "r", "\xc5\xa1" => "s", "\xc5\xa5" => "t", "\xc3\xba" => "u", "\xc5\xaf" => "u", "\xc3\xbc" => "u", "\xc5\xb1" => "u", "\xc3\xbd" => "y", "\xc5\xbe" => "z", "\xc3\x81" => "A", "\xc3\x84" => "A", "\xc4\x8c" => "C", "\xc4\x8e" => "D", "\xc3\x89" => "E", "\xc4\x9a" => "E", "\xc3\x8d" => "I", "\xc4\xbd" => "L", "\xc4\xb9" => "L", "\xc5\x87" => "N", "\xc3\x93" => "O", "\xc3\x96" => "O", "\xc5\x90" => "O", "\xc3\x94" => "O", "\xc5\x98" => "R", "\xc5\x94" => "R", "\xc5\xa0" => "S", "\xc5\xa4" => "T", "\xc3\x9a" => "U", "\xc5\xae" => "U", "\xc3\x9c" => "U", "\xc5\xb0" => "U", "\xc3\x9d" => "Y", "\xc5\xbd" => "Z"));
-}
-
-/**
- * Generates random string from 0-9a-zA-Z.
- *
- * @param int $length Length of the string
- * @param bool $safe All lookalike chars (1×I×l, 0×O...) will be removed
- * @param bool $noVwls No vowels (won't generate nasty words, like sex or porn - they contains vowels)
- *
- * @return string
- */
-function genRandomString($length = 32, $safe = false, $noVwls = false)
-{
-	if ($safe) $chars = "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	else $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	if ($noVwls) $chars = str_replace(array("a", "e", "i", "o", "u", "A", "E", "I", "O", "U"), "", $chars);
-	$str = "";
-	for ($p = 0; $p < $length; $p++) $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
-	return $str;
 }
 
 
@@ -155,17 +128,25 @@ class Util
 		return $str;
 	}
 
+	public static function isMobile()
+	{
+		return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|bo‌​ost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
+	}
+
 	public static function isNumeric($str)
 	{
 		return is_numeric($str);
 	}
 
-	public static function log($value, $title = null)
+	public static function log($value = "\t\t", $title = null)
 	{
-		// TODO: This MUST be in a renderer!!! Also Messager!!!
+		if ($value === "\t\t") $value = time();
+		// TODO FIXME: This MUST be in a renderer!!! Also Messager!!!
+		$btr = debug_backtrace(0)[0];
 		echo "<div style=\"clear:both;text-align:left;width:720px;margin:5px auto;background:#fff;color:#333;position:relative;z-index:9999;padding:15px;font-size:1em;\">";
 		if ($title !== null) echo "<pre>-------------------- <h3 style=\"color:#00a;display:inline;clear:none;float:none;margin:0;padding:0;\">".$title."</h3> --------------------</pre>";
 		var_dump($value);
+		echo "<div style=\"font-size:0.9em;color:#999;font-family:monospace;\">".$btr["file"].":".$btr["line"]."</div>";
 		echo "</div>";
 	}
 
@@ -177,7 +158,7 @@ class Util
 	 *
 	 * @return array|null
 	 */
-	public static function getSettings($str, $delimiter = " ", array $data = null) // , $delimiter='\ ', $noValue=''
+	public static function getQueRow($str, $delimiter = " ", array $data = null) // , $delimiter='\ ', $noValue=''
 	{
 		preg_match_all("/([^".$delimiter.":]+)(:[^".$delimiter."]*)?\\".$delimiter."/", trim($str).$delimiter, $matches, PREG_SET_ORDER); // TODO: is using str_replace the only way?
 		if ($matches == array()) return null;
@@ -205,7 +186,7 @@ class Util
 
 		$xx = explode("%", $str);
 		$strx = "";
-		foreach ($xx as $x) $strx .= (isset($data[$x]) ? $data[$x] : $x);
+		foreach ($xx as $x) $strx .= (array_key_exists($x, $data) ? $data[$x] : $x);
 		return $strx;
 	}
 
@@ -216,6 +197,34 @@ class Util
 		return (ceil($pow * $value) + ceil($pow * $value - ceil($pow * $value))) / $pow;
 	}
 
+	/**
+	 * @param $s
+	 *
+	 * @return string
+	 */
+	public static function cs_utf2ascii($s)
+	{
+		return strtr($s, array("\xc3\xa1" => "a", "\xc3\xa4" => "a", "\xc4\x8d" => "c", "\xc4\x8f" => "d", "\xc3\xa9" => "e", "\xc4\x9b" => "e", "\xc3\xad" => "i", "\xc4\xbe" => "l", "\xc4\xba" => "l", "\xc5\x88" => "n", "\xc3\xb3" => "o", "\xc3\xb6" => "o", "\xc5\x91" => "o", "\xc3\xb4" => "o", "\xc5\x99" => "r", "\xc5\x95" => "r", "\xc5\xa1" => "s", "\xc5\xa5" => "t", "\xc3\xba" => "u", "\xc5\xaf" => "u", "\xc3\xbc" => "u", "\xc5\xb1" => "u", "\xc3\xbd" => "y", "\xc5\xbe" => "z", "\xc3\x81" => "A", "\xc3\x84" => "A", "\xc4\x8c" => "C", "\xc4\x8e" => "D", "\xc3\x89" => "E", "\xc4\x9a" => "E", "\xc3\x8d" => "I", "\xc4\xbd" => "L", "\xc4\xb9" => "L", "\xc5\x87" => "N", "\xc3\x93" => "O", "\xc3\x96" => "O", "\xc5\x90" => "O", "\xc3\x94" => "O", "\xc5\x98" => "R", "\xc5\x94" => "R", "\xc5\xa0" => "S", "\xc5\xa4" => "T", "\xc3\x9a" => "U", "\xc5\xae" => "U", "\xc3\x9c" => "U", "\xc5\xb0" => "U", "\xc3\x9d" => "Y", "\xc5\xbd" => "Z"));
+	}
+
+	/**
+	 * Generates random string from 0-9a-zA-Z.
+	 *
+	 * @param int $length Length of the string
+	 * @param bool $safe All lookalike chars (1×I×l, 0×O...) will be removed
+	 * @param bool $noVowels No vowels (won't generate nasty words, like sex or porn - they contains vowels)
+	 *
+	 * @return string
+	 */
+	public static function getRandomString($length = 32, $safe = false, $noVowels = false)
+	{
+		if ($safe) $chars = "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+		else $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		if ($noVowels) $chars = str_replace(["a", "e", "i", "o", "u", "A", "E", "I", "O", "U"], "", $chars);
+		$str = "";
+		for ($p = 0; $p < $length; $p++) $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+		return $str;
+	}
 
 	/** Returns class name */
 	public static function getClassName($className)
@@ -268,42 +277,47 @@ class Util
 	}
 
 
+	public static function parseTime($time)
+	{
+		$t = explode(":", str_replace(" ", "", $time));
+		return ($t[0] * 3600) + ($t[1] * 60) + (isset($t[2]) ? $t[2] : 0);
+	}
+
 	/**
 	 * Converts date in QetriX DateTime Format to datetime formatted string
 	 *
-	 * @param $str
+	 * @param $dtstr
 	 * @param string $format
 	 *
 	 * @internal param $hr
 	 * @return string
 	 */
-	public static function formatDateTime($str, $format = '%3$d.%2$d.%1$d %4$02d:%5$02d')
+	public static function formatDateTime($dtstr, $format = "%3\$d.%2\$d.%1\$d %4\$02d:%5\$02d")
 	{
 		/*
 		* 201100000000 = year 2011 (2011)
-		* 201100100000 = 1st half of 2011
 		* 201100010000 = 1st quarter of 2011 (I/2011)
 		* 201110000000 = October 2011 (=> 201110) (10/2010)
 		* 201101000000 = January 2011 (01/2010)
 		* 201101100000 = January 10, 2011 (10.1.2011)
 		 */
-		if ($str == "") return "";
-		$str = substr($str."00000000000000", 0, 14);
-		$s = substr($str, -2);
-		$str = substr($str, 0, -2);
-		$m = substr($str, -2);
-		$str = substr($str, 0, -2);
-		$h = substr($str, -2);
-		$str = substr($str, 0, -2);
-		$d = substr($str, -2);
-		$str = substr($str, 0, -2);
-		$M = substr($str, -2);
-		$str = substr($str, 0, -2);
-		$y = $str;
+		if ($dtstr == "") return "";
+		$dtstr = substr(str_replace(["-", ".", "/", " ", ":"], "", $dtstr)."00000000000000", 0, 14); // Replace allows direct use of yyyy-mm-dd dates (MySQL)
+		$s = substr($dtstr, -2);
+		$dtstr = substr($dtstr, 0, -2);
+		$m = substr($dtstr, -2);
+		$dtstr = substr($dtstr, 0, -2);
+		$h = substr($dtstr, -2);
+		$dtstr = substr($dtstr, 0, -2);
+		$d = substr($dtstr, -2);
+		$dtstr = substr($dtstr, 0, -2);
+		$M = substr($dtstr, -2);
+		$dtstr = substr($dtstr, 0, -2);
+		$y = $dtstr;
 
-		if ($M + 0 == 0 && $d + 0 == 0) return $y;
-		elseif ($M + 0 > 0 && $d + 0 == 0) return $M."/".$y;
-		elseif ($M + 0 == 0 && $d + 0 > 0) {
+		if ($M + 0 == 0 && $d + 0 == 0) return $y; // Year only
+		elseif ($M + 0 > 0 && $d + 0 == 0) return $M."/".$y; // Year+Month
+		elseif ($M + 0 == 0 && $d + 0 > 0) { // Year+Quart
 			$arr = array(null, "I", "II", "III", "IV");
 			return $arr[$d + 0]."/".$y;
 		}
@@ -343,6 +357,9 @@ class Util
 
 	/**
 	 * Generates Universal Unique ID ("UUID" or "GUID")
+	 *
+	 * @param bool $compressed
+	 *
 	 * @return string
 	 */
 	public static function uuid($compressed = false)
@@ -394,10 +411,10 @@ class Util
 	 * convert(str, b, c); => Convert str from type b to format c
 	 * convert(str, b, c, d); => Convert str from type b to c.d
 	*/
-	public static function convert($data, $arg1 = null, $arg2 = null, $arg3 = null, $args = array())
+	public static function convert($data, $arg1 = null, $arg2 = null, $arg3 = null, $args = [])
 	{
 		$fromFormat = null;
-		$toFormat = QApp::getInstance()->outputFormat();
+		$toFormat = QPage::getInstance()->outputFormat();
 		$toType = "";
 
 		if ($data === null) throw new \Exception("Error: null is not convertible."); // TODO: Maybe debug only? May return empty string.
@@ -405,25 +422,25 @@ class Util
 		// Data as Object
 		if (is_object($data)) {
 			$fromFormat = Util::getClassName($data);
-			if ($arg2 === null) { // Convert(obj, p1)
+			if ($arg2 === null) { // convert(obj, p1)
 				$toType = $arg1;
-			} elseif ($arg3 === null) { // Convert(obj, p1, p2)
+			} elseif ($arg3 === null) { // convert(obj, p1, p2)
 				$toFormat = $arg1;
 				$toType = $arg2;
 			} else {
-				throw new \Exception("Error: Convert for ".$fromFormat." cannot define from_format, becuase it's derived from it's type.");
+				throw new \Exception("Error: Convert for ".$fromFormat." cannot define fromFormat, becuase it's derived from it's type.");
 			}
 
 			// Data as String
 		} elseif (is_string($data)) {
 			$data = trim($data);
 
-			if ($arg2 === null) { // Convert("str", p1)
+			if ($arg2 === null) { // convert("str", p1)
 				$fromFormat = $arg1;
-			} elseif ($arg3 === null) { // Convert("str", p1, p2)
+			} elseif ($arg3 === null) { // convert("str", p1, p2)
 				$fromFormat = $arg1;
 				$toFormat = $arg2;
-			} else { // Convert("str", p1, p2, p3)
+			} else { // convert("str", p1, p2, p3)
 				$fromFormat = $arg1;
 				$toFormat = $arg2;
 				$toType = $arg3;
@@ -435,12 +452,55 @@ class Util
 			$toFormat = $arg1;
 		}
 
-		$convPath = "converters/".strToLower($fromFormat."_".$toFormat.($toType != "" ? "_".$toType : "")).".php";
-		$path = file_exists(QApp::getInstance()->pathApp().$convPath) ? QApp::getInstance()->pathApp() : QApp::getInstance()->pathAppCommon();
-		if (!file_exists($path.$convPath)) throw new \Exception("Error: Convertor ".$convPath." not found!"); // TODO: Disable for PROD for performance
+		$convClass = QPage::getInstance()->loadConverter($fromFormat, $toFormat, $toType);
+		return $convClass->convert($data, new Dict($args));
+
+		/*$convPath = "converters/".strToLower($fromFormat."_".$toFormat.($toType != "" ? "_".$toType : "")).".php";
+		$path = file_exists(QPage::getInstance()->pathApp().$convPath) ? QPage::getInstance()->pathApp() : QPage::getInstance()->pathAppCommon();
+		if (!file_exists($path.$convPath)) throw new \Exception("Error: Converter ".substr($convPath, 11, -4)." not found!"); // TODO: Disable for PROD for performance
 		include_once $path.$convPath;
-		$convClass = "com\\qetrix\\apps\\".($path == QApp::getInstance()->pathApp() ? QApp::getInstance()->name() : "common")."\\converters\\".$fromFormat."_".$toFormat.($toType != "" ? "_".$toType : "");
-		return (new $convClass())->convert($data, $args);
+		$convClass = "com\\qetrix\\apps\\".QPage::getInstance()->name()."\\converters\\".$fromFormat."_".$toFormat.($toType != "" ? "_".$toType : "");
+		if (!class_exists($convClass)) $convClass = "com\\qetrix\\apps\\common\\converters\\".$fromFormat."_".$toFormat.($toType != "" ? "_".$toType : "");
+		return (new $convClass())->convert($data, $args);*/
+	}
+
+	public static function vincentyDistance($lat1, $lon1, $lat2, $lon2)
+	{
+		$a = 6378137;
+		$b = 6356752.314245;
+		$f = ($a - $b) / $a; //1 / 298.257223563; // WGS-84 ellipsoid params; ($a - $b) / $a; //flattening of the ellipsoid
+		$L = deg2rad($lon2) - deg2rad($lon1); //difference in longitude
+		$U1 = atan((1 - $f) * tan(deg2rad($lat1))); //U is 'reduced latitude'
+		$U2 = atan((1 - $f) * tan(deg2rad($lat2)));
+		$sinU1 = sin($U1);
+		$sinU2 = sin($U2);
+		$cosU1 = cos($U1);
+		$cosU2 = cos($U2);
+		$lambda = $L;
+		$lambdaP = 2 * pi();
+		$i = 20;
+		while (abs($lambda - $lambdaP) > 1e-12 and --$i > 0) {
+			$sinLambda = sin($lambda);
+			$cosLambda = cos($lambda);
+			$sinSigma = sqrt(($cosU2 * $sinLambda) * ($cosU2 * $sinLambda) + ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda) * ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda));
+			if ($sinSigma == 0) return 0; //co-incident points
+			$cosSigma = $sinU1 * $sinU2 + $cosU1 * $cosU2 * $cosLambda;
+			$sigma = atan2($sinSigma, $cosSigma);
+			$sinAlpha = $cosU1 * $cosU2 * $sinLambda / $sinSigma;
+			$cosSqAlpha = 1 - $sinAlpha * $sinAlpha;
+			$cos2SigmaM = $cosSigma - 2 * $sinU1 * $sinU2 / $cosSqAlpha;
+			if (is_nan($cos2SigmaM)) $cos2SigmaM = 0; //equatorial line: cosSqAlpha=0 (6)
+			$c = $f / 16 * $cosSqAlpha * (4 + $f * (4 - 3 * $cosSqAlpha));
+			$lambdaP = $lambda;
+			$lambda = $L + (1 - $c) * $f * $sinAlpha * ($sigma + $c * $sinSigma * ($cos2SigmaM + $c * $cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM)));
+		}
+		if ($i == 0) return false; //formula failed to converge
+		$uSq = $cosSqAlpha * ($a * $a - $b * $b) / ($b * $b);
+		$A = 1 + $uSq / 16384 * (4096 + $uSq * (-768 + $uSq * (320 - 175 * $uSq)));
+		$B = $uSq / 1024 * (256 + $uSq * (-128 + $uSq * (74 - 47 * $uSq)));
+		$deltaSigma = $B * $sinSigma * ($cos2SigmaM + $B / 4 * ($cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM) - $B / 6 * $cos2SigmaM * (-3 + 4 * $sinSigma * $sinSigma) * (-3 + 4 * $cos2SigmaM * $cos2SigmaM)));
+		$d = $b * $A * ($sigma - $deltaSigma);
+		return number_format($d, 3, '.', ''); //round to 1mm precision
 	}
 }
 
@@ -504,22 +564,4 @@ function hm($sec)
 	$h = floor($sec / 3600);
 	$m = floor(($sec % 3600) / 60);
 	return $h."h ".substr("00".$m, -2)."m";
-}
-
-/** Set Navigation Link for QList (see some custom MySQL DataStores) */
-function setNavLink($path, $pagelink, $action, $text, array $items = null)
-{
-	// Util::log($action, $pagelink);
-	$item = array();
-	if ($text !== null) $item["text"] = $text;
-	if ($pagelink != $action && $action !== null) {
-		$item["action"] = (strpos($action, "://") === false ? $path : '').$action;
-		if (substr($pagelink, 0, strlen($action)) == $action) $item["selected"] = true;
-	}
-	if ($items !== null) {
-		$item["items"] = array();
-		foreach ($items as $i) $item["items"][] = setNavLink($path, $pagelink, $i["action"], $i["text"], isset($i["items"]) ? $i["items"] : null);
-	}
-	if ($action === null && $text === null) return $item["items"];
-	return $item;
 }
