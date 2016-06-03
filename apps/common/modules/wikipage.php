@@ -2,7 +2,7 @@
 namespace com\qetrix\apps\common\modules;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.02.22 | WikiPage Module
+ * 16.06.01 | WikiPage Module
  */
 
 use com\qetrix\libs\components\qform;
@@ -42,6 +42,7 @@ class WikiPage extends QModule
 	public function main(Dict $args)
 	{
 		//if (!isset($this->page()->path()) || $this->page()->path() == "") $this->page()->path() = $this->app()->title();
+		$this->loadPage(); // +MNo 20160601
 		return $this->QPage($args, $this->midCol($args).
 			(method_exists($this, "rightCol") ? $this->rightCol($args) : "").
 			(method_exists($this, "leftCol") ? $this->leftCol($args) : "")
@@ -155,10 +156,10 @@ class WikiPage extends QModule
 		}
 	}
 
-	function getpageid()
+	/*function getpageid()
 	{
 		echo $this->page()->get("id");
-	}
+	}*/
 
 	function _new(Dict $args)
 	{
@@ -192,9 +193,9 @@ class WikiPage extends QModule
 		$list->addCol("published", "");
 		$list->add($this->ds()->get("getfullpages", null, 10));
 
-		return $this->QPage($args, $list->convert("blogposts").
-			(method_exists($this, "rightCol") ? $this->rightCol() : "").
-			(method_exists($this, "leftCol") ? $this->leftCol() : ""),
+		return $this->QPage($args, $list->convert("blogposts")
+			.(method_exists($this, "rightCol") ? $this->rightCol() : "")
+			.(method_exists($this, "leftCol") ? $this->leftCol() : ""),
 			"bplist"
 		);
 	}
@@ -255,13 +256,13 @@ class WikiPage extends QModule
 		$form->add(new QFormControl(QFormControlType::wikitext, "pagetext", "", trim($data)."\n", 100));
 
 		return $this->QPage($args, $form->convert());
-		return $form->convert();
 	}
 
 	function pagetext()
 	{
 		return trim($this->dataDS->getData($this->page()->get("pagename"))[0]["dv"])."\n";
 	}
+
 
 	public function xedit(Dict $args)
 	{
@@ -276,7 +277,7 @@ class WikiPage extends QModule
 		else if ($this->page()->envDS("file", "imgfile") != "") {
 			$this->dataDS->setContent("imgfile");
 			die($this->page()->envDS("file", "imgfile"));
-		} else if ($this->page()->getFormData("relbut") != "") $this->ds->addRel($this->page()->get("id"), $this->page()->getFormData("relpage"));
+		} else if ($this->page()->getFormData("relbut") != "") $this->ds()->addRel($this->page()->get("id"), $this->page()->getFormData("relpage"));
 		try {
 			$data = $this->dataDS->getData($this->pagePath)[0]["dv"]; // Has to be string, it's filesystem ds!
 		} catch (\Exception $e) {
@@ -288,6 +289,11 @@ class WikiPage extends QModule
 			$relList->rows($this->ds()->getEntityRelations($this->wikiPage->id()));
 		}
 
+		/*$EditForm = new QForm("edit");
+		$EditForm->Add(new QForm\QFormControl("textbox"));
+		$EditForm->Add(new QForm\QFormControl("button"));
+		$EditForm->ConvertTo($this->outputFormat);*/
+
 		$form = new QForm("edit");
 		$form->add((new QFormControl(QFormControlType::button, "viewbut", null, "View", 10))->action("view"));
 		$form->add(new QFormControl(QFormControlType::text, "pagename", null, htmlspecialchars($this->pageTitle), 10));
@@ -296,7 +302,85 @@ class WikiPage extends QModule
 		$form->add((new QFormControl(QFormControlType::button, "delbut", null, "Delete", 10))->action("delpage"));
 		$form->add(new QFormControl(QFormControlType::wikitext, "pagetext", "", trim(htmlspecialchars($data))."\n", 100));
 		return $this->QPage($args, $form->convert());
+
+		return $this->QPage("<form method=\"post\" action=\"\" class=\"pageEdit\">
+<div id=\"toolbar\"><input type=\"button\" value=\"View\" name=\"closebut\" onclick=\"location.href='".mb_substr(str_replace("//", "/", $this->app()->get("path").$this->app()->get("pathRel")), 0, -4)."';\"><input type=\"text\" value=\"".htmlspecialchars($this->pageTitle)."\" name=\"pagename\"><input type=\"submit\" value=\"Save\" name=\"text_savebut\" id=\"text_savebut\"><input type=\"submit\" disabled value=\"Delete\" name=\"delbut\" style=\"float:right;\"></div>
+<textarea autofocus lang=\"cs\" id=\"text\" name=\"pagetext\" style=\"/*width:620px;*/width:100%;height:700px;margin:0;padding:0 5px;font-size:.85em;\">".htmlspecialchars($data)."</textarea>
+</form>".(isset($relList) ? $relList->convert() : "")."
+<form method=\"post\" action=\"\" style=\"width:300px;float:right;clear:none;margin-left:0;margin-top:0;\">
+	<h3>Nový obrázek</h3>
+	<div id=\"dropzone\" style=\"padding:20px 0;width:275px;float:left;text-align:center;border:1px dotted grey;\">Drag & drop your file here...</div>
+</form>
+<form method=\"post\" action=\"\" style=\"width:300px;float:right;clear:none;margin-left:0;margin-top:0;\">
+	<h3>Související články</h3>
+	<input type=\"text\" name=\"relpage\" style=\"width:200px;\" placeholder=\"Relativní URL strany\"><input type=\"submit\" name=\"relbut\" value=\"Vložit\" class=\"btn\">
+</form>
+    <script type=\"text/javascript\">
+        function sendFile(file) {
+            var uri = \"".$this->app()->get("path").$this->page()->path()."\" + (j.indexOf(\"?\") > 0 ? \"&\" : \"?\") + \"xhr=\" + new Date().getTime();
+            var xhr = new XMLHttpRequest();
+            var fd = new FormData();
+
+            xhr.open(\"POST\", uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+		            var dropzone = document.getElementById(\"dropzone\");
+		            dropzone.innerHTML = xhr.responseText;
+                }
+            };
+            fd.append('imgfile', file);
+            xhr.send(fd);
+        }
+
+        window.onload = function() {
+			if (e(\"text\") != null) {
+				e(\"text\").onkeydown = function(evt){return wikiTextKeyDown(this,evt);};
+			}
+            var dropzone = document.getElementById(\"dropzone\");
+            dropzone.ondragover = dropzone.ondragenter = function(event) {
+            	this.style.borderStyle = 'solid';
+                event.stopPropagation();
+                event.preventDefault();
+            };
+
+            dropzone.ondragleave = function(event) {
+            	this.style.borderStyle = 'dotted';
+            };
+
+            dropzone.ondrop = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                var filesArray = event.dataTransfer.files;
+                for (var i=0; i<filesArray.length; i++) {
+                    sendFile(filesArray[i]);
+                }
+            };
+        }
+    </script>
+");
 	}
+
+	/*function rightCol()
+	{
+		$rightCol = new QView("rightcol");
+		$rightCol->add($this->banner());
+		if ($this->page !== null && $this->app()->ds()->hasFeature("getrela")) $rightCol->add($this->related($this->page->get("title_cs", "p")));
+		return $rightCol->convert();
+	}
+
+	function banner()
+	{
+		return "<img src=\"".$this->app()->get("pathContent")."ba/banner300x250.png\">";
+	}
+
+	function related()
+	{
+		$list = new QList("articles");
+		$list->rows($this->ds->getEntityRelations($this->page->id()));
+		$list->heading("Související články");
+		return $list->convert("articles");
+	}*/
 
 	function footer(Dict $args)
 	{
