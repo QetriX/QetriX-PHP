@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types = 1);
 namespace com\qetrix\libs;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.03.22 | QetriX Utils Class
+ * 16.06.03 | QetriX Utils Class
  */
 
 function x()
@@ -33,7 +33,7 @@ function lbl($code, $translation = null) // TODO: Merge with lbl2
  *
  * @return string
  */
-function lbl2($code) // TODO: Merge with lbl
+function lbl2($code) // TODO: Merge with lblQB
 {
 	global $lng;
 	if ($lng == "") return $code;
@@ -262,7 +262,7 @@ class Util
 		if (strpos($num, ".") !== false) {
 			$x = ($num - round($num))."";
 			if (abs($x) > 0.0001) { /// bypasses error in rounding
-				if (strlen(abs($x)) - 2 < $maxdec) $maxdec = strlen(abs($x)) - 2;
+				if (strlen(abs($x)."") - 2 < $maxdec) $maxdec = strlen(abs($x)."") - 2;
 				for ($i = strpos($num, "."); $i < $maxdec + 1; $i++) {
 					if (!isset($x[$i + 2]) || ($x[$i + 2] == "0" && ($x[$i + 3] == "0" || !isset($x[$i + 3])))) {
 						$maxdec = $i;
@@ -270,9 +270,9 @@ class Util
 					}
 				}
 			} else $x = 0;
-			$numx = number_format($num, $maxdec, ".", " ");
+			$numx = number_format($num + 0, $maxdec, ".", " ");
 			if (substr($numx, -1) == "0") $numx = substr($numx, 0, -1);
-		} else $numx = number_format($num, 0, ".", " ");
+		} else $numx = number_format($num + 0, 0, ".", " ");
 		return $numx;
 	}
 
@@ -564,4 +564,59 @@ function hm($sec)
 	$h = floor($sec / 3600);
 	$m = floor(($sec % 3600) / 60);
 	return $h."h ".substr("00".$m, -2)."m";
+}
+
+/** Set Navigation Link for QList (see some custom MySQL DataStores) */
+/*function setNavLink($path, $pagelink, $action, $text, array $items = null)
+{
+	// Util::log($action, $pagelink);
+	$item = array();
+	if ($text !== null) $item["text"] = $text;
+	if ($pagelink != $action && $action !== null) {
+		$item["action"] = (strpos($action, "://") === false ? $path : '').$action;
+		if (substr($pagelink, 0, strlen($action)) == $action) $item["selected"] = true;
+	}
+	if ($items !== null) {
+		$item["items"] = array();
+		foreach ($items as $i) $item["items"][] = setNavLink($path, $pagelink, $i["action"], $i["text"], isset($i["items"]) ? $i["items"] : null);
+	}
+	if ($action === null && $text === null && isset($item["items"])) return $item["items"];
+	return $item;
+}
+*/
+
+/** @link http://wiki.qetrix.com/Qag */
+class Dict
+{
+	private $data = [];
+
+	public function __construct($value = [], $add = [])
+	{
+		if (is_object($value)) $value = (get_class($value) == "com\\qetrix\\libs\\Dict" ? $value->data : []);
+		$this->data = array_merge(array_change_key_case($value, CASE_LOWER), array_change_key_case($add, CASE_LOWER));
+	}
+
+	public function get($key, $valueIfNotFound = "")
+	{
+		$key = strToLower($key."");
+		return isset($this->data[$key]) ? $this->data[$key] : $valueIfNotFound;
+	}
+
+	public function set($key, $value)
+	{
+		if (is_array($value)) $this->data = array_merge($this->data, array_change_key_case($value, CASE_LOWER));
+		else $this->data[strToLower($key."")] = $value;
+		return $this;
+	}
+
+	public function has($key)
+	{
+		return isset($this->data[strToLower($key."")]);
+	}
+
+	public function del($key)
+	{
+		unset($this->data[strToLower($key."")]);
+		return $this;
+	}
 }
