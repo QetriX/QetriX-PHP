@@ -1,5 +1,4 @@
-<?php
-declare(strict_types = 1);
+<?php declare(strict_types = 1);
 namespace com\qetrix\libs\components;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
