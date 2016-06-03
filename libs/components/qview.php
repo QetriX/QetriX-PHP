@@ -1,13 +1,11 @@
-<?php
+<?php declare(strict_types = 1);
 namespace com\qetrix\libs\components;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 16.02.18 | QView Component
+ * 16.05.24 | QView Component
  */
 
 use com\qetrix\libs\Util;
-
-require_once dirname(__FILE__)."/component.php";
 
 class QView extends Component
 {
@@ -25,7 +23,7 @@ class QView extends Component
 	{
 		parent::__construct();
 		$this->_name = $name;
-		$this->_heading = $heading;
+		$this->heading($heading);
 	}
 
 	/** Add a section (string to direct output) */
@@ -35,11 +33,12 @@ class QView extends Component
 
 		if (is_string($value)) {
 			$this->_sections[$scope][] = $value;
-
+		} elseif (is_array($value)) {
+			$this->_sections[$scope] = array_merge($this->_sections[$scope], $value);
 		} elseif (is_object($value)) {
 			$ent = $value;
 			//Util::log($value, get_class($value));
-		}
+		} else $this->_sections[$scope][] = $value.""; // TODO (=> this is because value is_number)
 
 		return $this;
 	}
@@ -54,4 +53,6 @@ class QView extends Component
 		if (isset($this->_sections[$scope])) return $this->_sections[$scope];
 		return null;
 	}
+
+	/// Section: ID, style, action, format (date)
 }
