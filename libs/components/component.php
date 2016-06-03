@@ -1,31 +1,34 @@
-<?php
+<?php declare(strict_types = 1);
 namespace com\qetrix\libs\components;
 
 /* Copyright (c) QetriX.com. Licensed under MIT License, see /LICENSE.txt file.
- * 15.12.20 | QetriX Component PHP class
+ * 16.05.24 | QetriX Component PHP class
  */
 
-use com\qetrix\libs\QApp;
+use com\qetrix\libs\Dict;
+use com\qetrix\libs\QModule;
+use com\qetrix\libs\QPage;
 use com\qetrix\libs\Util;
+use com\qetrix\libs\ValueType;
 
 class Component
 {
 	/** @var \com\qetrix\libs\DataStore null */
 	protected $datastore = null;
 	/** @var String null */
-	protected $_name = null;
+	protected $_name = "";
 	/** @var String null */
-	protected $_heading = null;
+	protected $_heading = "";
 	/** @var String null */
-	protected $_action = null;
+	protected $_action = "";
 
-	protected $_style = null;
-	protected $_app = null;
+	protected $_style = "";
+	protected $_page = null;
 
 	/** PHP constructor */
 	function __construct($name = null, $heading = null)
 	{
-		$this->_app = QApp::getInstance();
+		$this->_page = QPage::getInstance();
 		$this->_name = $name;
 		$this->_heading = $heading;
 	}
@@ -58,10 +61,19 @@ class Component
 		return $this;
 	}
 
-	/** Get the app, used often by converters */
-	public function app()
+	public function action($value = null, QModule $mod = null, Dict $args = null, $but = null)
 	{
-		return $this->_app;
+		if ($value === null) return $this->_action; // Get data
+		$this->_action = $value;
+		return $this;
+	}
+
+	/** Get the page, used often by converters
+	 * @return QPage
+	 */
+	public function page()
+	{
+		return $this->_page;
 	}
 
 	/** Convert the component to something else (HTML, JSON, XML...) */
@@ -70,10 +82,15 @@ class Component
 		return Util::convert($this, $arg1, $arg2, $arg3);
 	}
 
-	public function action($value = null)
+	public function formatValue($value, $type)
 	{
-		if ($value === null) return $this->_action; // Get data
-		$this->_action = $value;
-		return $this;
+		switch ($type+0) {
+			case ValueType::dateTime:
+				return Util::formatDateTime($value);
+			case ValueType::number:
+				return Util::formatNumber($value);
+				//return date("", strToTime($value));
+		}
+		return $value;
 	}
 }
