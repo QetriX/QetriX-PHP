@@ -19,4 +19,4 @@ Minimal version
 * .htaccess
 * qetrix.php
 
-In this configuration, the whole framework has less, than 100 kB.
+In this configuration, the whole framework has less, than 100 kB (~2000 lines of code).
