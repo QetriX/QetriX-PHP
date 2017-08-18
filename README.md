@@ -18,3 +18,5 @@ Minimal version
   * **logs**
 * .htaccess
 * qetrix.php
+
+In this configuration, the whole framework has less, than 100 kB.
