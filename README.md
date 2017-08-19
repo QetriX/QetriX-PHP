@@ -6,9 +6,6 @@ Minimal version
 ---------------
 
 * **libs**
-  * **components**
-    * qview.php
-    * component.php
   * qmodule.php
   * qpage.php
   * util.php
@@ -16,7 +13,8 @@ Minimal version
   * [module].php
 * **vars**
   * **logs**
-* .htaccess
 * qetrix.php
 
-In this configuration, the whole framework has less, than 100 kB (~2000 lines of code).
+In this configuration, the whole framework has ~80 kB (~2000 lines of code). All classes are regular, there's no "lite" version. QetriX is designed to be highly extensible, so even such integral parts, like components, are optional.
+
+Made with ❤️ in Prague, CZ 🇨🇿
