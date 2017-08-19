@@ -16,5 +16,3 @@ Minimal version
 * qetrix.php
 
 In this configuration, the whole framework has ~80 kB (~2000 lines of code). All classes are regular, there's no "lite" version. QetriX is designed to be highly extensible, so even such integral parts, like components, are optional.
-
-Handcrafted with ❤ in Prague, CZ 🇨🇿
